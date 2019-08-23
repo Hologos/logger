@@ -61,14 +61,6 @@ function logger::init() {
     _LOGGER_LEVEL="${level}"
 }
 
-# function logger::set_level() {
-#     return
-# }
-
-# function logger::get_level() {
-#     return
-# }
-
 function logger::log() {
     local level="${1}"
     # local message="${2}"
