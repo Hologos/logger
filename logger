@@ -1,0 +1,83 @@
+#! /usr/bin/env bash
+
+# VERSION=<VERSION>
+
+declare -A _LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
+
+function logger::__print_call_stack() {
+    local stack_size="${#FUNCNAME[@]}"
+
+    >&2 echo
+    >&2 echo "Stack trace:"
+
+    local i=0
+
+    for (( i=$(( stack_size - 1 )); i >= 2; i-- )); do
+        local function_name="${FUNCNAME[$(( i - 1 ))]:-"MAIN"}"
+        local source_line_number="${BASH_LINENO[$(( i - 1 ))]}"
+        local function_source="${BASH_SOURCE[$i]:-"non_file_source"}"
+
+        # TODO: align to right
+        >&2 echo -n "   "
+        >&2 echo "$(( stack_size - i )): ${function_source}:${source_line_number} > ${function_name}()"
+    done
+}
+
+function logger::__message() {
+    local level="${1}"
+    local message="${2}"
+
+    local datetime="\D{%d.%m.%Y %H:%M:%S}"
+
+    >&2 echo "[${datetime@P}] ${level}: ${message}"
+}
+
+function logger::__terminate() {
+    local message="${1}"
+
+    logger::__message "C" "${message}"
+    logger::__print_call_stack
+
+    exit 1
+}
+
+function logger::__is_level_set() {
+    if [[ -z "${_LOGGER_LEVEL+_}" ]]; then
+        logger::__terminate "Level is not set."
+    fi
+}
+
+function logger::__validate_level() {
+    local key="${1}"
+
+    if [[ -z "${_LOGGER_LEVELS_MAP[${key}]+_}" ]]; then
+        logger::__terminate "Level '${level}' is not supported."
+    fi
+}
+
+function logger::init() {
+    local level="${1}"
+
+    logger::__validate_level "${level}"
+
+    _LOGGER_LEVEL="${level}"
+}
+
+function logger::log() {
+    local level="${1}"
+    local message="${@:2}"
+
+    logger::__is_level_set
+    logger::__validate_level "${level}"
+
+    # level A is allowed only for
+    if [[ "${level}" == "A" ]]; then
+        logger::__terminate "Message's level cannot be set to A."
+    fi
+
+    if [[ ${_LOGGER_LEVELS_MAP[${level}]} -lt ${_LOGGER_LEVELS_MAP[${_LOGGER_LEVEL}]} ]]; then
+        return
+    fi
+
+    logger::__message "${level}" "${message}"
+}
