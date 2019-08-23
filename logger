@@ -1,15 +1,6 @@
 #! /usr/bin/env bash
 
-_LOGGER_LEVELS_MAP=(
-    "A" # 0: all
-    "T" # 1: trace
-    "D" # 2: debug
-    "I" # 3: info
-    "N" # 4: notice
-    "W" # 5: warning
-    "E" # 6: error
-    "C" # 7: critical
-)
+declare -A _LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
 
 function logger::__print_call_stack() {
     local stack_size="${#FUNCNAME[@]}"
@@ -28,21 +19,6 @@ function logger::__print_call_stack() {
         >&2 echo -n "   "
         >&2 echo "$(( stack_size - i )): ${function_source}:${source_line_number} > ${function_name}()"
     done
-}
-
-function logger::__get_level_index() {
-    local level="${1}"
-
-    local logger_level_index=0
-
-    for logger_level_index in "${!_LOGGER_LEVELS_MAP[@]}"; do
-        if [[ "${_LOGGER_LEVELS_MAP[${logger_level_index}]}" == "${level}" ]]; then
-            printf ${logger_level_index}
-            return
-        fi
-    done
-
-    logger::__terminate "Level '${level}' is not supported."
 }
 
 function logger::__message() {
@@ -70,9 +46,11 @@ function logger::__is_level_set() {
 }
 
 function logger::__validate_level() {
-    local level="${1}"
+    local key="${1}"
 
-    local level_index="$(logger::__get_level_index "${level}")"
+    if [[ -z "${_LOGGER_LEVELS_MAP[${key}]+_}" ]]; then
+        logger::__terminate "Level '${level}' is not supported."
+    fi
 }
 
 function logger::init() {
@@ -92,17 +70,14 @@ function logger::init() {
 # }
 
 function logger::log() {
-
     local level="${1}"
     # local message="${2}"
     local message="${@:2}" # TODO: FIX array
 
     logger::__is_level_set
+    logger::__validate_level "${level}"
 
-    local level_index="$(logger::__get_level_index "${level}")"
-    local global_level_index="$(logger::__get_level_index "${_LOGGER_LEVEL}")"
-
-    if [[ ${level_index} -lt ${global_level_index} ]]; then
+    if [[ ${_LOGGER_LEVELS_MAP[${level}]} -lt ${_LOGGER_LEVELS_MAP[${_LOGGER_LEVEL}]} ]]; then
         return
     fi
 
