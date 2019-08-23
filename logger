@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
 declare -A _LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
+declare -A _LOGGER_LOG_OR_NOT_TO_LOG_THATS_THE_QUESTION
 
 function logger::__print_call_stack() {
     local stack_size="${#FUNCNAME[@]}"
@@ -59,6 +60,17 @@ function logger::init() {
     logger::__validate_level "${level}"
 
     _LOGGER_LEVEL="${level}"
+
+    local key=""
+
+    for key in "${!_LOGGER_LEVELS_MAP[@]}"; do
+        if [[ ${_LOGGER_LEVELS_MAP[${key}]} -lt ${_LOGGER_LEVELS_MAP[${level}]} ]]; then
+            _LOGGER_LOG_OR_NOT_TO_LOG_THATS_THE_QUESTION[${key}]=0 # do NOT report
+            unset _LOGGER_LOG_OR_NOT_TO_LOG_THATS_THE_QUESTION[${key}]
+        else
+            _LOGGER_LOG_OR_NOT_TO_LOG_THATS_THE_QUESTION[${key}]=1 # do report
+        fi
+    done
 }
 
 # function logger::set_level() {
@@ -77,7 +89,7 @@ function logger::log() {
     logger::__is_level_set
     logger::__validate_level "${level}"
 
-    if [[ ${_LOGGER_LEVELS_MAP[${level}]} -lt ${_LOGGER_LEVELS_MAP[${_LOGGER_LEVEL}]} ]]; then
+    if ! [[ ${_LOGGER_LOG_OR_NOT_TO_LOG_THATS_THE_QUESTION[${level}]+_} ]]; then
         return
     fi
 
