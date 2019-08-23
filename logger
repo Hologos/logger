@@ -63,8 +63,7 @@ function logger::init() {
 
 function logger::log() {
     local level="${1}"
-    # local message="${2}"
-    local message="${@:2}" # TODO: FIX array
+    local message="${@:2}"
 
     logger::__is_level_set
     logger::__validate_level "${level}"
