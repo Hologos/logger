@@ -40,7 +40,7 @@ function logger::__terminate() {
 }
 
 function logger::__is_level_set() {
-    if [[ -z ${_LOGGER_LEVEL+_} ]]; then
+    if [[ -z "${_LOGGER_LEVEL+_}" ]]; then
         logger::__terminate "Level is not set."
     fi
 }
