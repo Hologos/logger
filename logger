@@ -69,6 +69,11 @@ function logger::log() {
     logger::__is_level_set
     logger::__validate_level "${level}"
 
+    # level A is allowed only for
+    if [[ "${level}" == "A" ]]; then
+        logger::__terminate "Message's level cannot be set to A."
+    fi
+
     if [[ ${_LOGGER_LEVELS_MAP[${level}]} -lt ${_LOGGER_LEVELS_MAP[${_LOGGER_LEVEL}]} ]]; then
         return
     fi
