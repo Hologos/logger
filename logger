@@ -25,9 +25,9 @@ function logger::__message() {
     local level="${1}"
     local message="${2}"
 
-    local datetime="$(date +'%d.%m.%Y %H:%M:%S')"
+    local datetime="\D{%d.%m.%Y %H:%M:%S}"
 
-    >&2 echo "[${datetime}] ${level}: ${message}"
+    >&2 echo "[${datetime@P}] ${level}: ${message}"
 }
 
 function logger::__terminate() {
