@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+# VERSION=<VERSION>
+
 declare -A _LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
 
 function logger::__print_call_stack() {
