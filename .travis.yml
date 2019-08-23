@@ -1,0 +1,14 @@
+language: bash
+if: tag IS present
+script:
+  - sed -i "s/<VERSION>/${TRAVIS_TAG}/g" logger
+deploy:
+  provider: releases
+  api_key:
+    secure: WEAQvPbsdl/1sI5UBRhVIDBbD7rCeR/VdteSkUzm40y/aoTU2DTDKIus78WgUfug/NBkPf5a5BTCl1zMdvy4vHuvTz3S3V7mHWwY2hrrFdz9NdaEqa03pQqx8NgusWGIcbbcN0oK9C0HGssex1Ma/ZD3kP7oLaUaB4e5UoZvVQJCJFKI3GghEYXw0CG5Vmv0W3KqX5Js/eqPkcZmQohUWyyGbs2Z5zTcw9kAI6BtMhfE59AJXHechRluQlUxxYcaw71HwJO1ryjXqVLG3ukMDyNdcUCy97dFDnv5Wy+lYgPRYEoWGH3Eypjizw1TESBKJ+v94HqLqPlFTDIeb89p3UWWsRorqxHs9vE+S6nTQHm1JiuZ2y9dl9PqZAMrGbHwiX4ZU4Xe3DLgz0oLzr77RgHZDYmXY/POsw0zXNTNJGaAN7p/9ffKVdluhqRYdCBDnIwocFd4wngA/i1/dLetaBZvzA4YC3HWzB0idezsATquLsZSlaYLBVOZzwMIm3I89B9GG+e+mDe9XOSKehUwC7SepTPimvCZ38cuHyVCsP6pVB99YH9e7pZUiAv6Xr433ovlkjkAko/VJkw+7Y1EE1eCD4yCUXdWOfKYSO6G+OEEpXkxN+/eoHL511TTvHtvrn53a58xuHUZsIjeHj9DNF5zCnPXGaQM92AyQhtJkSk=
+  file: logger
+  skip_cleanup: true
+  on:
+    repo: Hologos/logger
+    tags: true
+  draft: true
