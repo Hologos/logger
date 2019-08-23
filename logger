@@ -1,0 +1,106 @@
+#! /usr/bin/env bash
+
+LOGGER_ALL=0
+LOGGER_TRACE=1
+LOGGER_DEBUG=2
+LOGGER_INFO=3
+LOGGER_NOTICE=4
+LOGGER_WARNING=5
+LOGGER_ERROR=6
+LOGGER_CRITICAL=7
+
+_LOGGER_LEVELS_MAP=(
+    "A" # all
+    "T" # trace
+    "D" # debug
+    "I" # info
+    "N" # notice
+    "W" # warning
+    "E" # error
+    "C" # critical
+)
+
+function logger::__print_call_stack() {
+    local stack_size="${#FUNCNAME[@]}"
+
+    >&2 echo
+    >&2 echo "Stack trace:"
+
+    for (( i=$(( stack_size - 1 )); i >= 2; i-- )); do
+        local function_name="${FUNCNAME[$(( i - 1 ))]:-"MAIN"}"
+        local source_line_number="${BASH_LINENO[$(( i - 1 ))]}"
+        local function_source="${BASH_SOURCE[$i]:-"non_file_source"}"
+
+        # TODO: align to right
+        >&2 echo -n "   "
+        >&2 echo "$(( stack_size - i )): ${function_source}:${source_line_number} > ${function_name}()"
+    done
+}
+
+function logger::__message() {
+    local level="${1}"
+    local message="${2}"
+
+    local datetime="$(date +'%d.%m.%Y %H:%M:%S')"
+
+    >&2 echo "[${datetime}] ${_LOGGER_LEVELS_MAP[${level}]}: ${message}"
+}
+
+function logger::__terminate() {
+    local message="${1}"
+
+    logger::__message "${LOGGER_CRITICAL}" "${message}"
+    logger::__print_call_stack
+
+    exit 1
+}
+
+function logger::__is_level_set() {
+    if [[ -z ${_LOGGER_LEVEL+_} ]]; then
+        logger::__terminate "Level is not set."
+    fi
+}
+
+function logger::__validate_level() {
+    local level="${1}"
+
+    case ${level} in
+        ${LOGGER_ALL} | ${LOGGER_TRACE} | ${LOGGER_DEBUG} | ${LOGGER_INFO} | \
+        ${LOGGER_NOTICE} | ${LOGGER_WARNING} | ${LOGGER_ERROR} | ${LOGGER_CRITICAL} )
+            # do nothing
+        ;;
+
+        *)
+            logger::__terminate "Level '${level}' is not supported."
+    esac
+}
+
+function logger::init() {
+    local level="${1}"
+
+    logger::__validate_level "${level}"
+
+    _LOGGER_LEVEL="${level}"
+}
+
+# function logger::set_level() {
+#     return
+# }
+
+# function logger::get_level() {
+#     return
+# }
+
+function logger::log() {
+    local level="${1}"
+    local message="${2}"
+
+    logger::__is_level_set
+    logger::__validate_level "${level}"
+
+    if [[ ${level} -lt ${_LOGGER_LEVEL} ]]; then
+        return
+    fi
+
+    logger::__message "${level}" "${message}"
+}
