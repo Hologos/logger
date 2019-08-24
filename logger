@@ -9,7 +9,7 @@ case "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}" in
     ;;
 esac
 
-declare -A _LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
+declare -A __LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
 
 function logger::__print_call_stack() {
     local stack_size="${#FUNCNAME[@]}"
@@ -37,12 +37,12 @@ function logger::__message() {
     local datetime="\D{%d.%m.%Y %H:%M:%S}"
     local line="[${datetime@P}] ${level}: ${message}"
 
-    if [[ -z "${_LOGGER_FILEPATH+_}" ]]; then
+    if [[ -z "${__LOGGER_FILEPATH+_}" ]]; then
         >&2 echo "${line}"
     else
-        echo "${line}" >> "${_LOGGER_FILEPATH}" || {
+        echo "${line}" >> "${__LOGGER_FILEPATH}" || {
             # if saving log message to file fails, print it to STDERR
-            >&2 echo "[${datetime@P}] C: Cannot write to log file '${_LOGGER_FILEPATH}' anymore."
+            >&2 echo "[${datetime@P}] C: Cannot write to log file '${__LOGGER_FILEPATH}' anymore."
             >&2 echo "${line}"
         }
     fi
@@ -58,7 +58,7 @@ function logger::__terminate() {
 }
 
 function logger::__is_global_level_set() {
-    if [[ -z "${_LOGGER_LEVEL+_}" ]]; then
+    if [[ -z "${__LOGGER_LEVEL+_}" ]]; then
         logger::__terminate "Global level is not set."
     fi
 }
@@ -66,7 +66,7 @@ function logger::__is_global_level_set() {
 function logger::__validate_level() {
     local level="${1}"
 
-    if [[ -z "${_LOGGER_LEVELS_MAP[${level}]+_}" ]]; then
+    if [[ -z "${__LOGGER_LEVELS_MAP[${level}]+_}" ]]; then
         logger::__terminate "Level '${level}' is not supported."
     fi
 }
@@ -100,14 +100,14 @@ function logger::init() {
 
     logger::__validate_level "${level}"
 
-    _LOGGER_LEVEL="${level}"
+    __LOGGER_LEVEL="${level}"
 
     if [[ ${#} -eq 2 ]]; then
         log_filepath="${2}"
 
         logger::__prepare_log "${log_filepath}"
 
-        _LOGGER_FILEPATH="${log_filepath}"
+        __LOGGER_FILEPATH="${log_filepath}"
     fi
 }
 
@@ -123,7 +123,7 @@ function logger::log() {
         logger::__terminate "Message's level cannot be set to A."
     fi
 
-    if [[ ${_LOGGER_LEVELS_MAP[${level}]} -lt ${_LOGGER_LEVELS_MAP[${_LOGGER_LEVEL}]} ]]; then
+    if [[ ${__LOGGER_LEVELS_MAP[${level}]} -lt ${__LOGGER_LEVELS_MAP[${__LOGGER_LEVEL}]} ]]; then
         return
     fi
 
