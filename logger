@@ -2,6 +2,13 @@
 
 # VERSION=<VERSION>
 
+case "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}" in
+    [1-3].* | 4.[1-3] )
+        >&2 echo "Least required version of bash is 4.4."
+        exit 1
+    ;;
+esac
+
 declare -A _LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
 
 function logger::__print_call_stack() {
