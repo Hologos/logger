@@ -6,6 +6,8 @@ A simple bash logger.
 
 Download `logger` file and place it within your project.
 
+**Important:** bash v4.4 and higher is required
+
 ## Usage
 
 ```bash
