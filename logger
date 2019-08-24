@@ -81,7 +81,7 @@ function logger::__prepare_log() {
     fi
 
     if [[ -w "${log_filepath}" ]]; then
-        return
+        return 0
     fi
 
     local log_dirpath="$(dirname "${log_filepath}")"
@@ -124,7 +124,7 @@ function logger::log() {
     fi
 
     if [[ ${__LOGGER_LEVELS_MAP[${level}]} -lt ${__LOGGER_LEVELS_MAP[${__LOGGER_LEVEL}]} ]]; then
-        return
+        return 0
     fi
 
     logger::__message "${level}" "${message}"
