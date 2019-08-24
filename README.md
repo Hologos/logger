@@ -28,6 +28,15 @@ The above code will generate following output to `STDERR`:
 [23.08.2019 18:04:57] W: This is a warning message.
 ```
 
+You can also initialize logger to write log messages to a file.
+
+```bash
+logger::init "D" "/tmp/debug.log"
+
+# log message will be writen to /tmp/debug.log
+logger::log "D" "This is a debug message."
+```
+
 ## Options
 
 ### Levels

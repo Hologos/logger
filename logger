@@ -28,8 +28,17 @@ function logger::__message() {
     local message="${2}"
 
     local datetime="\D{%d.%m.%Y %H:%M:%S}"
+    local line="[${datetime@P}] ${level}: ${message}"
 
-    >&2 echo "[${datetime@P}] ${level}: ${message}"
+    if [[ -z "${_LOGGER_FILEPATH+_}" ]]; then
+        >&2 echo "${line}"
+    else
+        echo "${line}" >> "${_LOGGER_FILEPATH}" || {
+            # if saving log message to file fails, print it to STDERR
+            >&2 echo "[${datetime@P}] C: Cannot write to log file '${_LOGGER_FILEPATH}' anymore."
+            >&2 echo "${line}"
+        }
+    fi
 }
 
 function logger::__terminate() {
@@ -55,12 +64,40 @@ function logger::__validate_level() {
     fi
 }
 
+function logger::__prepare_log() {
+    local log_filepath="${1}"
+
+    if [[ -d "${log_filepath}" ]]; then
+        logger::__terminate "'${log_filepath}' is a directory."
+    elif [[ -e "${log_filepath}" ]] && ! [[ -w "${log_filepath}" ]]; then
+        logger::__terminate "Log file '${log_filepath}' is not writable."
+    fi
+
+    local log_dirpath="$(dirname "${log_filepath}")"
+
+    if [[ ! -d "${log_dirpath}" ]]; then
+        logger::log "I" "Creating log directory '${log_dirpath}'."
+        mkdir -p "${log_dirpath}" || logger::__terminate "Cannot create log directory '${log_dirpath}'."
+    fi
+
+    touch "${log_filepath}" || logger::__terminate "Cannot create log file '${log_filepath}'."
+}
+
 function logger::init() {
     local level="${1}"
+    local log_filepath=""
 
     logger::__validate_level "${level}"
 
     _LOGGER_LEVEL="${level}"
+
+    if [[ ${#} -eq 2 ]]; then
+        log_filepath="${2}"
+
+        logger::__prepare_log "${log_filepath}"
+
+        _LOGGER_FILEPATH="${log_filepath}"
+    fi
 }
 
 function logger::log() {
