@@ -41,9 +41,9 @@ function logger::__terminate() {
     exit 1
 }
 
-function logger::__is_level_set() {
+function logger::__is_global_level_set() {
     if [[ -z "${_LOGGER_LEVEL+_}" ]]; then
-        logger::__terminate "Level is not set."
+        logger::__terminate "Global level is not set."
     fi
 }
 
@@ -67,7 +67,7 @@ function logger::log() {
     local level="${1}"
     local message="${@:2}"
 
-    logger::__is_level_set
+    logger::__is_global_level_set
     logger::__validate_level "${level}"
 
     # level A is allowed only for
