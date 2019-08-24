@@ -64,9 +64,9 @@ function logger::__is_global_level_set() {
 }
 
 function logger::__validate_level() {
-    local key="${1}"
+    local level="${1}"
 
-    if [[ -z "${_LOGGER_LEVELS_MAP[${key}]+_}" ]]; then
+    if [[ -z "${_LOGGER_LEVELS_MAP[${level}]+_}" ]]; then
         logger::__terminate "Level '${level}' is not supported."
     fi
 }
