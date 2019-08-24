@@ -73,6 +73,10 @@ function logger::__prepare_log() {
         logger::__terminate "Log file '${log_filepath}' is not writable."
     fi
 
+    if [[ -w "${log_filepath}" ]]; then
+        return
+    fi
+
     local log_dirpath="$(dirname "${log_filepath}")"
 
     if [[ ! -d "${log_dirpath}" ]]; then
