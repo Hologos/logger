@@ -58,7 +58,7 @@ function logger::__terminate() {
 }
 
 function logger::__is_global_level_set() {
-    if [[ -z "${__LOGGER_LEVEL+_}" ]]; then
+    if [[ -z "${__LOGGER_GLOBAL_LEVEL+_}" ]]; then
         logger::__terminate "Global level is not set."
     fi
 }
@@ -142,7 +142,7 @@ function logger::init() {
 
     logger::__validate_level "${level}"
 
-    __LOGGER_LEVEL="${level}"
+    __LOGGER_GLOBAL_LEVEL="${level}"
 
     if [[ ${#} -eq 2 ]]; then
         log_filepath="${2}"
@@ -165,7 +165,7 @@ function logger::log() {
         logger::__terminate "Message's level cannot be set to A."
     fi
 
-    if logger::level_is_lower "${level}" "${__LOGGER_LEVEL}"; then
+    if logger::level_is_lower "${level}" "${__LOGGER_GLOBAL_LEVEL}"; then
         return 0
     fi
 
