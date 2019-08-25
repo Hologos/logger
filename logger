@@ -165,7 +165,7 @@ function logger::log() {
         logger::__terminate "Message's level cannot be set to A."
     fi
 
-    if [[ ${__LOGGER_LEVELS_MAP[${level}]} -lt ${__LOGGER_LEVELS_MAP[${__LOGGER_LEVEL}]} ]]; then
+    if logger::level_is_lower "${level}" "${__LOGGER_LEVEL}"; then
         return 0
     fi
 
