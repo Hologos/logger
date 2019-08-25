@@ -94,6 +94,48 @@ function logger::__prepare_log() {
     touch "${log_filepath}" || logger::__terminate "Cannot create log file '${log_filepath}'."
 }
 
+function logger::level_is_lower() {
+    local level1="${1}"
+    local level2="${2}"
+
+    logger::__validate_level "${level1}"
+    logger::__validate_level "${level2}"
+
+    if [[ ${__LOGGER_LEVELS_MAP[${level1}]} -lt ${__LOGGER_LEVELS_MAP[${level2}]} ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
+function logger::level_is_equal() {
+    local level1="${1}"
+    local level2="${2}"
+
+    logger::__validate_level "${level1}"
+    logger::__validate_level "${level2}"
+
+    if [[ ${__LOGGER_LEVELS_MAP[${level1}]} -eq ${__LOGGER_LEVELS_MAP[${level2}]} ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
+function logger::level_is_greater() {
+    local level1="${1}"
+    local level2="${2}"
+
+    logger::__validate_level "${level1}"
+    logger::__validate_level "${level2}"
+
+    if [[ ${__LOGGER_LEVELS_MAP[${level1}]} -gt ${__LOGGER_LEVELS_MAP[${level2}]} ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
 function logger::init() {
     local level="${1}"
     local log_filepath=""
@@ -123,7 +165,7 @@ function logger::log() {
         logger::__terminate "Message's level cannot be set to A."
     fi
 
-    if [[ ${__LOGGER_LEVELS_MAP[${level}]} -lt ${__LOGGER_LEVELS_MAP[${__LOGGER_LEVEL}]} ]]; then
+    if logger::level_is_lower "${level}" "${__LOGGER_LEVEL}"; then
         return 0
     fi
 

@@ -1,4 +1,4 @@
-# logger
+# logger [![Build Status](https://travis-ci.org/Hologos/logger.svg?branch=master)](https://travis-ci.org/Hologos/logger)
 
 A simple bash logger.
 
@@ -12,7 +12,7 @@ Download `logger` file and place it within your project.
 
 ```bash
 # load the library
-. "path/to/library/logger"
+. "/path/to/library/logger"
 
 # first you have to initialize the logger
 logger::init "N"

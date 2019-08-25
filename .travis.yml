@@ -1,5 +1,7 @@
 language: bash
-if: tag IS present
+branches:
+  only:
+  - master
 before_script:
   - curl -sL https://raw.github.com/lehmannro/assert.sh/v1.1/assert.sh > assert.sh
   - docker pull bash:4.4.23
