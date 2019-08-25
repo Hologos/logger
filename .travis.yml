@@ -8,6 +8,7 @@ before_script:
   - docker run bash:4.4.23 --version
 script:
   # test needs to be run in docker, because it requires bash 4.4 or newer
+  # -u 1234 = so it doesn't run under root
   - docker run -v $PWD:$PWD -w $PWD -u 1234 bash:4.4.23 ./tests.sh
 before_deploy:
   - sed -i "s/<VERSION>/${TRAVIS_TAG}/g" logger
