@@ -1,6 +1,4 @@
-# logger
-
-[![Build Status](https://travis-ci.org/Hologos/logger.svg?branch=master)](https://travis-ci.org/Hologos/logger)
+# logger [![Build Status](https://travis-ci.org/Hologos/logger.svg?branch=master)](https://travis-ci.org/Hologos/logger)
 
 A simple bash logger.
 
