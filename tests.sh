@@ -93,3 +93,12 @@ assert_raises "logger::level_is_greater 'C' 'C'" 1
 assert_raises "logger::level_is_greater 'D' 'C'" 1
 
 assert_end "logger::level_is_greater() - should fail"
+
+# -- logger::get_global_level() - should succeed tests --------------------------------------
+
+assert "logger::init 'N'; logger::get_global_level" 'N'
+assert "logger::init 'N' '/tmp/debug.log'; logger::get_global_level" 'N'
+assert "logger::get_global_level" 'A'
+assert "logger::init 'N'; logger::init 'C'; logger::get_global_level" 'C'
+
+assert_end "logger::get_global_level() - should succeed"
