@@ -14,7 +14,7 @@ Download `logger` file and place it within your project.
 # load the library
 . "/path/to/library/logger"
 
-# first you have to initialize the logger
+# first you have to initialize the logger (default level is A = all messages)
 logger::init "N"
 
 # now you can log your messages
@@ -37,6 +37,24 @@ logger::init "D" "/tmp/debug.log"
 
 # log message will be writen to /tmp/debug.log
 logger::log "D" "This is a debug message."
+```
+
+### Passing an array in a message
+
+If you want to pass whole array in a message, it has to be quoted and expanded with `${array[*]}`.
+
+```bash
+input=( "with spaces" "etc" )
+
+# correct, message is "with spaces etc"
+logger::log "CD" "${input[*]}"
+
+# wrong, message is only "with spaces"
+logger::log "D" "${input[@]}"
+
+# also wrong, message is only "with"
+logger::log "D" ${input[*]}
+logger::log "D" ${input[@]}
 ```
 
 ## Options

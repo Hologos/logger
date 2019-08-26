@@ -11,6 +11,8 @@ esac
 
 declare -A __LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
 
+__LOGGER_GLOBAL_LEVEL="A"
+
 function logger::__print_call_stack() {
     local stack_size="${#FUNCNAME[@]}"
 
@@ -55,12 +57,6 @@ function logger::__terminate() {
     logger::__print_call_stack
 
     exit 1
-}
-
-function logger::__is_global_level_set() {
-    if [[ -z "${__LOGGER_LEVEL+_}" ]]; then
-        logger::__terminate "Global level is not set."
-    fi
 }
 
 function logger::__validate_level() {
@@ -142,7 +138,7 @@ function logger::init() {
 
     logger::__validate_level "${level}"
 
-    __LOGGER_LEVEL="${level}"
+    __LOGGER_GLOBAL_LEVEL="${level}"
 
     if [[ ${#} -eq 2 ]]; then
         log_filepath="${2}"
@@ -153,19 +149,22 @@ function logger::init() {
     fi
 }
 
+function logger::get_global_level() {
+    printf "%s" "${__LOGGER_GLOBAL_LEVEL}"
+}
+
 function logger::log() {
     local level="${1}"
-    local message="${@:2}"
+    local message="${2}"
 
-    logger::__is_global_level_set
     logger::__validate_level "${level}"
 
-    # level A is allowed only for
+    # level A is valid only in logger::init()
     if [[ "${level}" == "A" ]]; then
         logger::__terminate "Message's level cannot be set to A."
     fi
 
-    if logger::level_is_lower "${level}" "${__LOGGER_LEVEL}"; then
+    if logger::level_is_lower "${level}" "${__LOGGER_GLOBAL_LEVEL}"; then
         return 0
     fi
 
