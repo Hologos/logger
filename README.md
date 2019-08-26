@@ -47,7 +47,7 @@ If you want to pass whole array in a message, it has to be quoted and expanded w
 input=( "with spaces" "etc" )
 
 # correct, message is "with spaces etc"
-logger::log "CD" "${input[*]}"
+logger::log "D" "${input[*]}"
 
 # wrong, message is only "with spaces"
 logger::log "D" "${input[@]}"
