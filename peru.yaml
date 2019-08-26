@@ -1,5 +1,5 @@
 imports:
-    assert-sh: ./
+    assert-sh: vendor/lehmannro/assert.sh/
 
 git module assert-sh:
     url: https://github.com/lehmannro/assert.sh

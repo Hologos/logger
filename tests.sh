@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-. "./assert.sh"
+. "vendor/lehmannro/assert.sh/assert.sh"
 . "./logger"
 
 # -- logger::init() - should succeed tests --------------------------------------
