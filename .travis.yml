@@ -4,6 +4,7 @@ branches:
   only:
   - master
   - /^v\d+\.\d+(\.\d+)?(-\S+)?$/ # build all tags in form of semver
+  - travis # debugging of .travis.yml
 addons:
   apt:
     packages:
