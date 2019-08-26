@@ -36,7 +36,6 @@ assert "{ logger::init 'N' && logger::log 'D' 'This is a debug message.'; } 2>&1
 assert "{ logger::init 'A' && logger::log 'D' 'This is a debug message.'; } 2>&1" "[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
 assert "{ rm -f '/tmp/debug.log'; logger::init 'A' '/tmp/debug.log' && logger::log 'D' 'This is a debug message.' && cat '/tmp/debug.log'; } 2>&1" "[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
 
-assert 'params=("1" "2" "3"); logger::log "D" "Input parameters: ${params[@]}" 2>&1' "[$(date +'%d.%m.%Y %H:%M:%S')] D: Input parameters: 1"
 assert 'params=("1" "2" "3"); logger::log "D" "Input parameters: ${params[*]}" 2>&1' "[$(date +'%d.%m.%Y %H:%M:%S')] D: Input parameters: 1 2 3"
 
 assert_end "logger::log() - should succeed"
@@ -45,8 +44,9 @@ assert_end "logger::log() - should succeed"
 
 assert_raises "logger::init 'D'; logger::log 'X' 'This is a message.'" 1
 assert_raises "logger::init 'D'; logger::log 'A' 'This is a message.'" 1
+assert_raises 'params=("1" "2" "3"); logger::log "D" "Input parameters: ${params[@]}"' 1
 
-assert "{ rm -rf '/tmp/trace.log' && logger::init 'T' '/tmp/trace.log' && rm -f '/tmp/trace.log' && mkdir '/tmp/trace.log' && LANG=en logger::log 'D' 'This is a debug message.'; } 2>&1" "./logger: line 45: /tmp/trace.log: Is a directory\n[$(date +'%d.%m.%Y %H:%M:%S')] C: Cannot write to log file '/tmp/trace.log' anymore.\n[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
+assert "{ rm -rf '/tmp/trace.log' && logger::init 'T' '/tmp/trace.log' && rm -f '/tmp/trace.log' && mkdir '/tmp/trace.log' && LANG=en logger::log 'D' 'This is a debug message.'; } 2>&1" "./logger: line 48: /tmp/trace.log: Is a directory\n[$(date +'%d.%m.%Y %H:%M:%S')] C: Cannot write to log file '/tmp/trace.log' anymore.\n[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
 
 assert_end "logger::log() - should fail"
 
