@@ -3,7 +3,7 @@
 . "./assert.sh"
 . "./logger"
 
-# -- logger::init - should succeed tests --------------------------------------
+# -- logger::init() - should succeed tests --------------------------------------
 
 assert_raises "logger::init 'A'" 0
 assert_raises "logger::init 'T'" 0
@@ -18,7 +18,7 @@ assert_raises "logger::init 'N' '/tmp/debug.log'" 0
 
 assert_end "logger::init() - should succeed"
 
-# -- logger::init - should fail tests -----------------------------------------
+# -- logger::init() - should fail tests -----------------------------------------
 
 assert_raises "logger::init 'X'" 1
 
@@ -29,7 +29,7 @@ assert_raises "logger::init 'N' '/usr/debug.log'" 1
 
 assert_end "logger::init() - should fail"
 
-# -- logger::log - should succeed tests ---------------------------------------
+# -- logger::log() - should succeed tests ---------------------------------------
 assert "logger::log 'D' 'This is a debug message.' 2>&1" "[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
 assert "{ logger::init 'N' && logger::log 'D' 'This is a debug message.'; } 2>&1" ""
 assert "{ logger::init 'A' && logger::log 'D' 'This is a debug message.'; } 2>&1" "[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
@@ -37,7 +37,7 @@ assert "{ rm -f '/tmp/debug.log'; logger::init 'A' '/tmp/debug.log' && logger::l
 
 assert_end "logger::log() - should succeed"
 
-# -- logger::log - should fail tests ------------------------------------------
+# -- logger::log() - should fail tests ------------------------------------------
 
 assert_raises "logger::init 'D'; logger::log 'X' 'This is a message.'" 1
 assert_raises "logger::init 'D'; logger::log 'A' 'This is a message.'" 1
@@ -46,13 +46,13 @@ assert "{ rm -rf '/tmp/trace.log' && logger::init 'T' '/tmp/trace.log' && rm -f 
 
 assert_end "logger::log() - should fail"
 
-# -- logger::level_is_lower - should succeed tests --------------------------------------
+# -- logger::level_is_lower() - should succeed tests --------------------------------------
 
 assert_raises "logger::level_is_lower 'D' 'C'" 0
 
 assert_end "logger::level_is_lower() - should succeed"
 
-# -- logger::level_is_lower - should fail tests -----------------------------------------
+# -- logger::level_is_lower() - should fail tests -----------------------------------------
 
 assert_raises "logger::level_is_lower 'X' 'D'" 1
 assert_raises "logger::level_is_lower 'D' 'X'" 1
@@ -62,13 +62,13 @@ assert_raises "logger::level_is_lower 'C' 'D'" 1
 
 assert_end "logger::level_is_lower() - should fail"
 
-# -- logger::level_is_equal - should succeed tests --------------------------------------
+# -- logger::level_is_equal() - should succeed tests --------------------------------------
 
 assert_raises "logger::level_is_equal 'D' 'D'" 0
 
 assert_end "logger::level_is_equal() - should succeed"
 
-# -- logger::level_is_equal - should fail tests -----------------------------------------
+# -- logger::level_is_equal() - should fail tests -----------------------------------------
 
 assert_raises "logger::level_is_equal 'X' 'D'" 1
 assert_raises "logger::level_is_equal 'D' 'X'" 1
@@ -78,13 +78,13 @@ assert_raises "logger::level_is_equal 'D' 'C'" 1
 
 assert_end "logger::level_is_equal() - should fail"
 
-# -- logger::level_is_greater - should succeed tests --------------------------------------
+# -- logger::level_is_greater() - should succeed tests --------------------------------------
 
 assert_raises "logger::level_is_greater 'C' 'D'" 0
 
 assert_end "logger::level_is_greater() - should succeed"
 
-# -- logger::level_is_greater - should fail tests -----------------------------------------
+# -- logger::level_is_greater() - should fail tests -----------------------------------------
 
 assert_raises "logger::level_is_greater 'X' 'C'" 1
 assert_raises "logger::level_is_greater 'C' 'X'" 1
