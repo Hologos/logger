@@ -14,7 +14,7 @@ Download `logger` file and place it within your project.
 # load the library
 . "/path/to/library/logger"
 
-# first you have to initialize the logger
+# first you have to initialize the logger (default level is A = all messages)
 logger::init "N"
 
 # now you can log your messages
