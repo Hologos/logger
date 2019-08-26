@@ -11,6 +11,7 @@ esac
 
 declare -A __LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
 
+__LOGGER_GLOBAL_LABEL="__GLOBAL__"
 __LOGGER_GLOBAL_LEVEL="A"
 
 function logger::__print_call_stack() {
@@ -33,11 +34,16 @@ function logger::__print_call_stack() {
 }
 
 function logger::__message() {
-    local level="${1}"
-    local message="${2}"
+    local label="${1}"
+    local level="${2}"
+    local message="${3}"
 
     local datetime="\D{%d.%m.%Y %H:%M:%S}"
     local line="[${datetime@P}] ${level}: ${message}"
+
+    if [[ "${label}" != "${__LOGGER_GLOBAL_LABEL}" ]]; then
+        line+=" <label: ${label}>"
+    fi
 
     if [[ -z "${__LOGGER_FILEPATH+_}" ]]; then
         >&2 echo "${line}"
@@ -53,7 +59,7 @@ function logger::__message() {
 function logger::__terminate() {
     local message="${1}"
 
-    logger::__message "C" "${message}"
+    logger::__message "${__LOGGER_GLOBAL_LABEL}" "C" "${message}"
     logger::__print_call_stack
 
     exit 1
@@ -154,6 +160,14 @@ function logger::get_global_level() {
 }
 
 function logger::log() {
+    local label="${__LOGGER_GLOBAL_LABEL}"
+
+    if [[ ${#} -eq 3 ]]; then
+        label="${1}"
+
+        shift
+    fi
+
     local level="${1}"
     local message="${2}"
 
@@ -168,5 +182,5 @@ function logger::log() {
         return 0
     fi
 
-    logger::__message "${level}" "${message}"
+    logger::__message "${label}" "${level}" "${message}"
 }

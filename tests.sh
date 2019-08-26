@@ -45,7 +45,7 @@ assert_end "logger::log() - should succeed"
 assert_raises "logger::init 'D'; logger::log 'X' 'This is a message.'" 1
 assert_raises "logger::init 'D'; logger::log 'A' 'This is a message.'" 1
 
-assert "{ rm -rf '/tmp/trace.log' && logger::init 'T' '/tmp/trace.log' && rm -f '/tmp/trace.log' && mkdir '/tmp/trace.log' && LANG=en logger::log 'D' 'This is a debug message.'; } 2>&1" "./logger: line 45: /tmp/trace.log: Is a directory\n[$(date +'%d.%m.%Y %H:%M:%S')] C: Cannot write to log file '/tmp/trace.log' anymore.\n[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
+assert "{ rm -rf '/tmp/trace.log' && logger::init 'T' '/tmp/trace.log' && rm -f '/tmp/trace.log' && mkdir '/tmp/trace.log' && LANG=en logger::log 'D' 'This is a debug message.'; } 2>&1" "./logger: line 53: /tmp/trace.log: Is a directory\n[$(date +'%d.%m.%Y %H:%M:%S')] C: Cannot write to log file '/tmp/trace.log' anymore.\n[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
 
 assert_end "logger::log() - should fail"
 
