@@ -2,6 +2,7 @@ language: bash
 branches:
   only:
   - master
+  - /^v\d+\.\d+(\.\d+)?(-\S+)?$/ # build all tags in form of semver
 before_script:
   - curl -sL https://raw.github.com/lehmannro/assert.sh/v1.1/assert.sh > assert.sh
   - docker pull bash:4.4.23
