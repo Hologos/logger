@@ -39,6 +39,24 @@ logger::init "D" "/tmp/debug.log"
 logger::log "D" "This is a debug message."
 ```
 
+### Passing an array in a message
+
+If you want to pass whole array in a message, it has to be quoted and expanded with `${array[*]}`.
+
+```bash
+input=( "with spaces" "etc" )
+
+# correct, message is "with spaces etc"
+logger::log "CD" "${input[*]}"
+
+# wrong, message is only "with spaces"
+logger::log "D" "${input[@]}"
+
+# also wrong, message is only "with"
+logger::log "D" ${input[*]}
+logger::log "D" ${input[@]}
+```
+
 ## Options
 
 ### Levels

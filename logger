@@ -155,7 +155,7 @@ function logger::get_global_level() {
 
 function logger::log() {
     local level="${1}"
-    local message="${@:2}"
+    local message="${2}"
 
     logger::__validate_level "${level}"
 

@@ -35,7 +35,7 @@ assert "{ logger::init 'N' && logger::log 'D' 'This is a debug message.'; } 2>&1
 assert "{ logger::init 'A' && logger::log 'D' 'This is a debug message.'; } 2>&1" "[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
 assert "{ rm -f '/tmp/debug.log'; logger::init 'A' '/tmp/debug.log' && logger::log 'D' 'This is a debug message.' && cat '/tmp/debug.log'; } 2>&1" "[$(date +'%d.%m.%Y %H:%M:%S')] D: This is a debug message."
 
-assert 'params=("1" "2" "3"); logger::log "D" "Input parameters: ${params[@]}" 2>&1' "[$(date +'%d.%m.%Y %H:%M:%S')] D: Input parameters: 1 2 3"
+assert 'params=("1" "2" "3"); logger::log "D" "Input parameters: ${params[@]}" 2>&1' "[$(date +'%d.%m.%Y %H:%M:%S')] D: Input parameters: 1"
 assert 'params=("1" "2" "3"); logger::log "D" "Input parameters: ${params[*]}" 2>&1' "[$(date +'%d.%m.%Y %H:%M:%S')] D: Input parameters: 1 2 3"
 
 assert_end "logger::log() - should succeed"
