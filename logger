@@ -159,7 +159,7 @@ function logger::log() {
 
     logger::__validate_level "${level}"
 
-    # level A is allowed only for
+    # level A is valid only in logger::init()
     if [[ "${level}" == "A" ]]; then
         logger::__terminate "Message's level cannot be set to A."
     fi
