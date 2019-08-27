@@ -32,7 +32,7 @@ before_install:
   - pip install peru
 
 install:
-  - peru sync
+  - peru --file-basename=peru-dev.yaml sync
 
 before_script:
   - docker pull bash:${BASH_VERSION}
