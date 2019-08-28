@@ -132,6 +132,10 @@ function logger::level_is_greater() {
     return 1
 }
 
+function logger::get_global_level() {
+    printf "%s" "${__LOGGER_GLOBAL_LEVEL}"
+}
+
 function logger::init() {
     local level="${1}"
     local log_filepath=""
@@ -147,10 +151,6 @@ function logger::init() {
 
         __LOGGER_FILEPATH="${log_filepath}"
     fi
-}
-
-function logger::get_global_level() {
-    printf "%s" "${__LOGGER_GLOBAL_LEVEL}"
 }
 
 function logger::log() {
