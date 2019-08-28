@@ -99,9 +99,9 @@ assert_end "logger::level_is_greater() - should fail"
 
 # -- logger::get_level() - should succeed tests --------------------------------------
 
-assert "logger::init 'N'; logger::get_level" 'N'
-assert "logger::init 'N' '/tmp/debug.log'; logger::get_level" 'N'
-assert "logger::get_level" 'A'
-assert "logger::init 'N'; logger::init 'C'; logger::get_level" 'C'
+assert "{ logger::init 'N'; logger::get_level; } 2>&1" 'N'
+assert "{ logger::init 'N' '/tmp/debug.log'; logger::get_level; } 2>&1" 'N'
+assert "logger::get_level 2>&1" 'A'
+assert "{ logger::init 'N'; logger::init 'C'; logger::get_level; } 2>&1" 'C'
 
 assert_end "logger::get_level() - should succeed"
