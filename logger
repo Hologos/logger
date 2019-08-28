@@ -132,7 +132,7 @@ function logger::level_is_greater() {
     return 1
 }
 
-function logger::get_global_level() {
+function logger::get_level() {
     printf "%s" "${__LOGGER_GLOBAL_LEVEL}"
 }
 
