@@ -3,5 +3,8 @@ imports:
 
 git module assert-sh:
     url: https://github.com/lehmannro/assert.sh
-    pick: assert.sh
+    pick:
+        - assert.sh
+        - COPYING
+        - COPYING.LESSER
     rev: fe359e341670f1e8e86a3804ca00e5a3ebc30fa4
