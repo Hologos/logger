@@ -58,3 +58,4 @@ deploy:
     repo: Hologos/logger
     tags: true
   draft: true
+  name: "logger ${TRAVIS_TAG}"
