@@ -9,9 +9,11 @@ case "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}" in
     ;;
 esac
 
-declare -A __LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
+__LOGGER_GLOBAL_LABEL="__GLOBAL__"
 
-__LOGGER_GLOBAL_LEVEL="A"
+declare -A __LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
+declare -A __LOGGER_ID_TO_FILEPATH_MAP
+declare -A __LOGGER_ID_TO_LEVEL_MAP=( [${__LOGGER_GLOBAL_LABEL}]="A" )
 
 function logger::__print_call_stack() {
     local stack_size="${#FUNCNAME[@]}"
@@ -33,47 +35,73 @@ function logger::__print_call_stack() {
 }
 
 function logger::__message() {
-    local level="${1}"
-    local message="${2}"
+    local label="${1}"
+    local level="${2}"
+    local message="${3}"
 
     local datetime="\D{%d.%m.%Y %H:%M:%S}"
     local line="[${datetime@P}] ${level}: ${message}"
 
-    if [[ -z "${__LOGGER_FILEPATH+_}" ]]; then
+    if [[ -z "${__LOGGER_ID_TO_FILEPATH_MAP[${label}]+_}" ]]; then
         >&2 echo "${line}"
     else
-        echo "${line}" >> "${__LOGGER_FILEPATH}" || {
+        echo "${line}" >> "${__LOGGER_ID_TO_FILEPATH_MAP[${label}]}" || {
             # if saving log message to file fails, print it to STDERR
-            >&2 echo "[${datetime@P}] C: Cannot write to log file '${__LOGGER_FILEPATH}' anymore."
+            >&2 echo "[${datetime@P}] C: Cannot write to log file '${__LOGGER_ID_TO_FILEPATH_MAP[${label}]}' anymore."
             >&2 echo "${line}"
         }
     fi
 }
 
 function logger::__terminate() {
-    local message="${1}"
+    local label="${1}"
+    local message="${2}"
 
-    logger::__message "C" "${message}"
-    logger::__print_call_stack
+    # print call stack together with the message
+    if ! [[ -z "${__LOGGER_ID_TO_FILEPATH_MAP[${label}]+_}" ]]; then
+        message+=$'\n'"$(logger::__print_call_stack 2>&1)"
+        logger::__message "${label}" "C" "${message}"
+    else
+        logger::__message "${label}" "C" "${message}"
+        logger::__print_call_stack
+    fi
 
     exit 1
 }
 
+function logger::__validate_level_label() {
+    local label="${1}"
+
+    if [[ -z "${__LOGGER_ID_TO_LEVEL_MAP[${label}]+_}" ]]; then
+        logger::__terminate "${__LOGGER_GLOBAL_LABEL}" "Level for label '${label}' has not been registered."
+    fi
+}
+
+function logger::__validate_filepath_label() {
+    local label="${1}"
+
+    if [[ -z "${__LOGGER_ID_TO_FILEPATH_MAP[${label}]+_}" ]]; then
+        logger::__terminate "${__LOGGER_GLOBAL_LABEL}" "Filepath for label '${label}' has not been registered."
+    fi
+}
+
 function logger::__validate_level() {
+    local label="${__LOGGER_GLOBAL_LABEL}"
     local level="${1}"
 
     if [[ -z "${__LOGGER_LEVELS_MAP[${level}]+_}" ]]; then
-        logger::__terminate "Level '${level}' is not supported."
+        logger::__terminate "${label}" "Level '${level}' is not supported."
     fi
 }
 
 function logger::__prepare_log() {
+    local label="${__LOGGER_GLOBAL_LABEL}"
     local log_filepath="${1}"
 
     if [[ -d "${log_filepath}" ]]; then
-        logger::__terminate "'${log_filepath}' is a directory."
+        logger::__terminate "${label}" "'${log_filepath}' is a directory."
     elif [[ -e "${log_filepath}" ]] && ! [[ -w "${log_filepath}" ]]; then
-        logger::__terminate "Log file '${log_filepath}' is not writable."
+        logger::__terminate "${label}" "Log file '${log_filepath}' is not writable."
     fi
 
     if [[ -w "${log_filepath}" ]]; then
@@ -84,10 +112,10 @@ function logger::__prepare_log() {
 
     if [[ ! -d "${log_dirpath}" ]]; then
         logger::log "I" "Creating log directory '${log_dirpath}'."
-        mkdir -p "${log_dirpath}" || logger::__terminate "Cannot create log directory '${log_dirpath}'."
+        mkdir -p "${log_dirpath}" || logger::__terminate "${label}" "Cannot create log directory '${log_dirpath}'."
     fi
 
-    touch "${log_filepath}" || logger::__terminate "Cannot create log file '${log_filepath}'."
+    touch "${log_filepath}" || logger::__terminate "${label}" "Cannot create log file '${log_filepath}'."
 }
 
 function logger::level_is_lower() {
@@ -133,40 +161,99 @@ function logger::level_is_greater() {
 }
 
 function logger::get_level() {
-    printf "%s" "${__LOGGER_GLOBAL_LEVEL}"
+    local label="${__LOGGER_GLOBAL_LABEL}"
+
+    if [[ ${#} -eq 1 ]]; then
+        label="${1}"
+    fi
+
+    logger::__validate_level_label "${label}"
+
+    printf "%s" "${__LOGGER_ID_TO_LEVEL_MAP[${label}]}"
+}
+
+function logger::get_filepath() {
+    local label="${__LOGGER_GLOBAL_LABEL}"
+
+    if [[ ${#} -eq 1 ]]; then
+        label="${1}"
+    fi
+
+    logger::__validate_filepath_label "${label}"
+
+    printf "%s" "${__LOGGER_ID_TO_FILEPATH_MAP[${label}]}"
 }
 
 function logger::init() {
-    local level="${1}"
+    local label="${__LOGGER_GLOBAL_LABEL}"
+    local level=""
     local log_filepath=""
+
+    case ${#} in
+        1 )
+            level="${1}"
+        ;;
+
+        2 )
+            level="${1}"
+            log_filepath="${2}"
+        ;;
+
+        3 )
+            label="${1}"
+            level="${2}"
+            log_filepath="${3}"
+        ;;
+
+        * )
+            logger::__terminate "${label}" "Pass either 1, 2 or 3 parameters to ${FUNCNAME}()."
+    esac
 
     logger::__validate_level "${level}"
 
-    __LOGGER_GLOBAL_LEVEL="${level}"
+    __LOGGER_ID_TO_LEVEL_MAP[${label}]="${level}"
 
-    if [[ ${#} -eq 2 ]]; then
-        log_filepath="${2}"
-
+    if [[ ${#} -eq 1 ]]; then
+        unset __LOGGER_ID_TO_FILEPATH_MAP[${label}]
+    else
         logger::__prepare_log "${log_filepath}"
 
-        __LOGGER_FILEPATH="${log_filepath}"
+        __LOGGER_ID_TO_FILEPATH_MAP[${label}]="${log_filepath}"
     fi
 }
 
 function logger::log() {
-    local level="${1}"
-    local message="${2}"
+    local label="${__LOGGER_GLOBAL_LABEL}"
+    local level=""
+    local message=""
 
+    case ${#} in
+        2 )
+            level="${1}"
+            message="${2}"
+        ;;
+
+        3 )
+            label="${1}"
+            level="${2}"
+            message="${3}"
+        ;;
+
+        * )
+            logger::__terminate "${label}" "Pass either 2 or 3 parameters to ${FUNCNAME}()."
+    esac
+
+    logger::__validate_level_label "${label}"
     logger::__validate_level "${level}"
 
     # level A is valid only in logger::init()
     if [[ "${level}" == "A" ]]; then
-        logger::__terminate "Message's level cannot be set to A."
+        logger::__terminate "${label}" "Message's level cannot be set to A."
     fi
 
-    if logger::level_is_lower "${level}" "${__LOGGER_GLOBAL_LEVEL}"; then
+    if logger::level_is_lower "${level}" "${__LOGGER_ID_TO_LEVEL_MAP[${label}]}"; then
         return 0
     fi
 
-    logger::__message "${level}" "${message}"
+    logger::__message "${label}" "${level}" "${message}"
 }
