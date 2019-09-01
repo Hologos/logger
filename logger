@@ -9,11 +9,11 @@ case "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}" in
     ;;
 esac
 
-__LOGGER_GLOBAL_LABEL="__GLOBAL__"
+LOGGER_GLOBAL_LABEL="__GLOBAL__"
 
 declare -A __LOGGER_LEVELS_MAP=( [A]=0 [T]=1 [D]=2 [I]=3 [N]=4 [W]=5 [E]=6 [C]=7 )
 declare -A __LOGGER_ID_TO_FILEPATH_MAP
-declare -A __LOGGER_ID_TO_LEVEL_MAP=( [${__LOGGER_GLOBAL_LABEL}]="A" )
+declare -A __LOGGER_ID_TO_LEVEL_MAP=( [${LOGGER_GLOBAL_LABEL}]="A" )
 
 function logger::__print_call_stack() {
     local stack_size="${#FUNCNAME[@]}"
@@ -73,7 +73,7 @@ function logger::__validate_level_label() {
     local label="${1}"
 
     if [[ -z "${__LOGGER_ID_TO_LEVEL_MAP[${label}]+_}" ]]; then
-        logger::__terminate "${__LOGGER_GLOBAL_LABEL}" "Level for label '${label}' has not been registered."
+        logger::__terminate "${LOGGER_GLOBAL_LABEL}" "Level for label '${label}' has not been registered."
     fi
 }
 
@@ -81,12 +81,12 @@ function logger::__validate_filepath_label() {
     local label="${1}"
 
     if [[ -z "${__LOGGER_ID_TO_FILEPATH_MAP[${label}]+_}" ]]; then
-        logger::__terminate "${__LOGGER_GLOBAL_LABEL}" "Filepath for label '${label}' has not been registered."
+        logger::__terminate "${LOGGER_GLOBAL_LABEL}" "Filepath for label '${label}' has not been registered."
     fi
 }
 
 function logger::__validate_level() {
-    local label="${__LOGGER_GLOBAL_LABEL}"
+    local label="${LOGGER_GLOBAL_LABEL}"
     local level="${1}"
 
     if [[ -z "${__LOGGER_LEVELS_MAP[${level}]+_}" ]]; then
@@ -95,7 +95,7 @@ function logger::__validate_level() {
 }
 
 function logger::__prepare_log() {
-    local label="${__LOGGER_GLOBAL_LABEL}"
+    local label="${LOGGER_GLOBAL_LABEL}"
     local log_filepath="${1}"
 
     if [[ -d "${log_filepath}" ]]; then
@@ -161,7 +161,7 @@ function logger::level_is_greater() {
 }
 
 function logger::get_level() {
-    local label="${__LOGGER_GLOBAL_LABEL}"
+    local label="${LOGGER_GLOBAL_LABEL}"
 
     if [[ ${#} -eq 1 ]]; then
         label="${1}"
@@ -173,7 +173,7 @@ function logger::get_level() {
 }
 
 function logger::get_filepath() {
-    local label="${__LOGGER_GLOBAL_LABEL}"
+    local label="${LOGGER_GLOBAL_LABEL}"
 
     if [[ ${#} -eq 1 ]]; then
         label="${1}"
@@ -185,7 +185,7 @@ function logger::get_filepath() {
 }
 
 function logger::init() {
-    local label="${__LOGGER_GLOBAL_LABEL}"
+    local label="${LOGGER_GLOBAL_LABEL}"
     local level=""
     local log_filepath=""
 
@@ -223,7 +223,7 @@ function logger::init() {
 }
 
 function logger::log() {
-    local label="${__LOGGER_GLOBAL_LABEL}"
+    local label="${LOGGER_GLOBAL_LABEL}"
     local level=""
     local message=""
 
