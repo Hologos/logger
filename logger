@@ -108,7 +108,7 @@ function logger::__prepare_log() {
         return 0
     fi
 
-    local log_dirpath="$(dirname "${log_filepath}")"
+    local log_dirpath="$(dirname "${log_filepath}")" || logger::__terminate "${label}" "Cannot determine log directory ditpath from '${log_dirpath}'."
 
     if [[ ! -d "${log_dirpath}" ]]; then
         mkdir -p "${log_dirpath}" || logger::__terminate "${label}" "Cannot create log directory '${log_dirpath}'."
