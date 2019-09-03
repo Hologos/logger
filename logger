@@ -111,7 +111,6 @@ function logger::__prepare_log() {
     local log_dirpath="$(dirname "${log_filepath}")"
 
     if [[ ! -d "${log_dirpath}" ]]; then
-        logger::log "I" "Creating log directory '${log_dirpath}'."
         mkdir -p "${log_dirpath}" || logger::__terminate "${label}" "Cannot create log directory '${log_dirpath}'."
     fi
 
