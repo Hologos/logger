@@ -72,6 +72,10 @@ function logger::__terminate() {
 function logger::__validate_level_label() {
     local label="${1}"
 
+    if [[ "${label}" == "" ]]; then
+        logger::__terminate "${LOGGER_GLOBAL_LABEL}" "Label cannot be empty."
+    fi
+
     if [[ -z "${__LOGGER_ID_TO_LEVEL_MAP[${label}]+_}" ]]; then
         logger::__terminate "${LOGGER_GLOBAL_LABEL}" "Level for label '${label}' has not been registered."
     fi
@@ -79,6 +83,10 @@ function logger::__validate_level_label() {
 
 function logger::__validate_filepath_label() {
     local label="${1}"
+
+    if [[ "${label}" == "" ]]; then
+        logger::__terminate "${LOGGER_GLOBAL_LABEL}" "Label cannot be empty."
+    fi
 
     if [[ -z "${__LOGGER_ID_TO_FILEPATH_MAP[${label}]+_}" ]]; then
         logger::__terminate "${LOGGER_GLOBAL_LABEL}" "Filepath for label '${label}' has not been registered."
@@ -88,6 +96,10 @@ function logger::__validate_filepath_label() {
 function logger::__validate_level() {
     local label="${LOGGER_GLOBAL_LABEL}"
     local level="${1}"
+
+    if [[ "${level}" == "" ]]; then
+        logger::__terminate "${label}" "Level cannot be empty."
+    fi
 
     if [[ -z "${__LOGGER_LEVELS_MAP[${level}]+_}" ]]; then
         logger::__terminate "${label}" "Level '${level}' is not supported."
@@ -207,6 +219,10 @@ function logger::init() {
         * )
             logger::__terminate "${label}" "Pass either 1, 2 or 3 parameters to ${FUNCNAME}()."
     esac
+
+    if [[ "${label}" == "" ]]; then
+        logger::__terminate "${LOGGER_GLOBAL_LABEL}" "Label cannot be empty."
+    fi
 
     logger::__validate_level "${level}"
 
