@@ -263,7 +263,7 @@ function logger::log() {
 
     # level A is valid only in logger::init()
     if [[ "${level}" == "A" ]]; then
-        logger::__terminate "${label}" "Message's level cannot be set to A."
+        logger::__terminate "${label}" "Message level cannot be set to A."
     fi
 
     if logger::level_is_lower "${level}" "${__LOGGER_ID_TO_LEVEL_MAP[${label}]}"; then
